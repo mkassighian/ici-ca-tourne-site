@@ -1,0 +1,17 @@
+# Empêche la mise en pause du projet Supabase (plan Free : pause après 7 jours sans activité).
+# Secrets du dépôt : SUPABASE_URL (https://<ref>.supabase.co) et SUPABASE_ANON_KEY (clé publique de l'appli).
+name: keepalive
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Requête légère sur l'API REST
+        run: |
+          curl --fail --silent --show-error --max-time 30 \
+            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/works?select=id&limit=1" > /dev/null
